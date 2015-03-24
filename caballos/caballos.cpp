@@ -2,11 +2,24 @@
 #include <vector>
 #include <iostream>
 #include <stdlib.h>
+#include <queue>
 
 using namespace std;
 
 // Varios typedefs
 typedef pair<int, int> Coord;
+struct CoordEsp {
+    
+    int cant;
+    Coord c;
+
+    CoordEsp(int n, Coord d) : cant(n), c(d) { }
+
+    bool operator<(const struct CoordEsp& other) const {
+        //Como ordena el MaxHeap
+        return cant < other.cant;
+    }
+};
 typedef vector<int> Vec;
 typedef vector<Vec> Tablero;
 
@@ -19,12 +32,10 @@ bool algunRepetido(const Vec &v);
 bool valido(Tablero& p, int n, Coord& c, int k);
 
 int resolver(Tablero& p, int n);
-int resolverAux(Tablero& p, int n, Coord anterior);
+pair<int, Tablero> resolverAux(Tablero& p, int n, Coord anterior);
 
 void mostrar(Tablero& p, int n);
 int check(Tablero& p, int n);
-
-
 
 int main() {
 	int n;
@@ -98,13 +109,13 @@ int resolver(Tablero& p, int n) {
     mostrar(p, n);
     cout << endl;
     Coord principio(0, 0);
-    resolverAux(p, n, principio);
-    mostrar(p, n);
+    pair<int, Tablero> k = resolverAux(p, n, principio);
+    mostrar(k.second, n);
     cout << endl;
     return 0;
 }
 
-int resolverAux(Tablero& p, int n, Coord c) {
+pair<int,Tablero> resolverAux(Tablero& p, int n, Coord c) {
     // Encuentro proxima coordenada a rellenar
     bool encontroActual = p[c.first][c.second] == 0;
     while (c.first < n && !encontroActual) {
@@ -120,8 +131,18 @@ int resolverAux(Tablero& p, int n, Coord c) {
     //cout << c.first << c.second << endl;
     // Si no encontro un actual, ya no hay mas nada para completar 
     // (es precondicion que el tablero 'p' sea valido)
-    if (!encontroActual)
-        return true;
+    if (!encontroActual) {
+        // cuento la cantidad de caballos usados
+        int count = 0;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (p[i][j] == 2) {
+                    count = count + 1;
+                }
+            }
+        }
+        return pair<int, Tablero>(count, p);
+    }
 
     // me fijo cuales son los casilleros que podrian amenazar a la celda c
     vector<Coord> podrian_amenazar = coordenadasAmenazadas(n, c.first, c.second);
@@ -132,22 +153,31 @@ int resolverAux(Tablero& p, int n, Coord c) {
         nuevos_podrian_amenazar[i] = simAgregarCaballo(p, n, podrian_amenazar[i].first, podrian_amenazar[i].first);
     }
 
-    // busco el maximo de las 9 posibilidades
-    int max = nuevos_poner_en_c;
-    Coord max_coord = c;
+    // ordeno las 9 posibilidades de mayor a menor usando un heap
+    priority_queue<CoordEsp> heap;
+    heap.push(CoordEsp(nuevos_poner_en_c, c));
     for (int i = 0; i < podrian_amenazar.size(); i++) {
-        if (nuevos_podrian_amenazar[i] > max) {
-            max = nuevos_podrian_amenazar[i];
-            max_coord = podrian_amenazar[i];
+        heap.push(CoordEsp(nuevos_podrian_amenazar[i], podrian_amenazar[i]));
+    }
+
+    // voy probando las posiblidades a ver cual es la que minimiza los caballos usados
+    int min_result = n*n;
+    Coord min_coord(-1,-1);
+    Tablero min_tablero;
+    for (int i = 0; i < podrian_amenazar.size() + 1; i++) {
+        Tablero aux = p; // deep copy
+        CoordEsp ce = heap.top();
+        heap.pop();
+        agregarCaballo(aux, n, ce.c.first, ce.c.second);
+        pair<int, Tablero> k = resolverAux(aux, n, c);
+        if (k.first < min_result) {
+            min_result = k.first;
+            min_tablero = k.second;
+            min_coord = ce.c;
         }
     }
 
-    agregarCaballo(p, n, max_coord.first, max_coord.second);
-    //mostrar(p, n);
-    //cout << endl;
-    // vuelvo a pasar c, porque puede haber posiciones entre c y max_coord que no estan rellenadas
-    resolverAux(p, n, c);
-    return 0;
+    return pair<int, Tablero>(min_result, min_tablero);
 }
 
 bool amenazada(Tablero& p, int n, Coord c) {
