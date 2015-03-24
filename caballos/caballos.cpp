@@ -11,11 +11,20 @@ typedef vector<int> Vec;
 typedef vector<Vec> Tablero;
 
 // Prototipado de funciones
-int resolver(Tablero& p, int n);
-int resolverAux(Tablero& p, int n, Coord c);
+bool agregarCaballo(Tablero& p, int n, int f, int c);
+int simAgregarCaballo(Tablero& p, int n, int f, int c);
+vector<Coord> coordenadasAmenazadas(int n, int f, int c);
 bool amenazada(Tablero& p, int n, Coord c);
+bool algunRepetido(const Vec &v);
+bool valido(Tablero& p, int n, Coord& c, int k);
+
+int resolver(Tablero& p, int n);
+int resolverAux(Tablero& p, int n, Coord anterior);
+
 void mostrar(Tablero& p, int n);
 int check(Tablero& p, int n);
+
+
 
 int main() {
 	int n;
@@ -27,76 +36,118 @@ int main() {
     }
     
     Tablero p(n, Vec(n, 0));
+    bool tableroValido = true;
     for(int i = 0; i < k; i++) {
-        int x;
-        int y;
-        cin >> x >> y;
-        p[x][y] = 1;
+        int f, c;
+        cin >> f >> c;
+        tableroValido = tableroValido && agregarCaballo(p, n, f, c);
     }
-    //mostrar(p, n);
 
-    resolver(p,n);
+    if (tableroValido) {
+        resolver(p,n);
+    }
 
 	return 0;
 }
 
+bool agregarCaballo(Tablero& p, int n, int f, int c) {
+    if (p[f][c] == 2)
+        return true;
+    if (f < 0 || f >= n || c < 0 || c >= n)
+        return false;
+    p[f][c] = 2;
+    vector<Coord> cam = coordenadasAmenazadas(n, f, c);
+    for (int i = 0; i < cam.size(); i++)
+        // si cam[i] == 1 entonces no hace falta cambiarlo, y si cam[i] == 2 entonces estoy sacando un caballo !!
+        if (p[cam[i].first][cam[i].second] == 0) {
+            p[cam[i].first][cam[i].second] = 1;
+        }
+    return true;
+}
+
+// simula agregar un caballo, y me devuelve la cantidad de casillas nuevas amenazadas
+// precondicion: se puede agregar un caballo en la posicion (f,c)
+int simAgregarCaballo(Tablero& p, int n, int f, int c) {
+    //p[f][c] = 2;
+    int count = 0;
+    vector<Coord> cam = coordenadasAmenazadas(n, f, c);
+    for (int i = 0; i < cam.size(); i++) {
+        if (p[cam[i].first][cam[i].second] == 0) {
+            count = count + 1;
+        }
+    }
+    return count;
+}
+vector<Coord> coordenadasAmenazadas(int n, int f, int c) {
+    vector<Coord> solution;
+    solution.reserve(8);
+    Coord offsets[] = {make_pair(-1, 2),make_pair(2, -1),
+        make_pair(-1, -2),make_pair(-2, -1),
+        make_pair(2, 1),make_pair(1, 2),
+        make_pair(-2, 1),make_pair(1, -2)};
+    for (int i = 0; i < 8; i++) {
+        int x = offsets[i].first;
+        int y = offsets[i].second;
+        if (0<=f+x && f+x<n && 0<=c+y && c+y<n)
+            solution.push_back(make_pair(f+x, c+y));
+    }
+    return solution;
+}
+
 int resolver(Tablero& p, int n) {
-    // busco primera celda vacia no amenazada
-    Coord vacia(-1,-1);
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            Coord aux = Coord(i,j);
-            if (!amenazada(p, n, aux)) {
-                vacia = aux;
-                break;
-            }
-        }
-        if (vacia.first != -1 && vacia.second != -1) {
-            break;
-        }
-    }
-    if (vacia.first == -1 && vacia.second == -1) {
-        cout << "el tablero ya es una solucion" << endl;
-        return check(p, n);
-    } else {
-        return resolverAux(p, n, vacia);
-    }
+    mostrar(p, n);
+    cout << endl;
+    Coord principio(0, 0);
+    resolverAux(p, n, principio);
+    mostrar(p, n);
+    cout << endl;
+    return 0;
 }
 
 int resolverAux(Tablero& p, int n, Coord c) {
-    //cout << c.first << c.second;
-    // busco primera celda vacia no amenazada
-    Coord vacia(-1,-1);
-    for (int i = c.first; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            Coord aux = Coord(i,j);
-            if (!amenazada(p, n, aux)) {
-                vacia = aux;
-                break;
-            }
+    // Encuentro proxima coordenada a rellenar
+    bool encontroActual = p[c.first][c.second] == 0;
+    while (c.first < n && !encontroActual) {
+        if (c.second < n-1){
+            c.second++;
+        } else {
+            c.second = 0;
+            c.first = c.first + 1;
         }
-        if (vacia.first != -1 && vacia.second != -1) {
-            break;
+        if (c.first < n && p[c.first][c.second] == 0)
+            encontroActual = true;
+    }
+    //cout << c.first << c.second << endl;
+    // Si no encontro un actual, ya no hay mas nada para completar 
+    // (es precondicion que el tablero 'p' sea valido)
+    if (!encontroActual)
+        return true;
+
+    // me fijo cuales son los casilleros que podrian amenazar a la celda c
+    vector<Coord> podrian_amenazar = coordenadasAmenazadas(n, c.first, c.second);
+    // cuento cuantos casilleros vacios poniendo un caballo nuevo en cada una de las posibilidades (maximo 9 contando c)
+    int nuevos_poner_en_c = simAgregarCaballo(p, n, c.first, c.second);
+    Vec nuevos_podrian_amenazar = Vec(podrian_amenazar.size(), 0);
+    for (int i = 0; i < podrian_amenazar.size(); i++) {
+        nuevos_podrian_amenazar[i] = simAgregarCaballo(p, n, podrian_amenazar[i].first, podrian_amenazar[i].first);
+    }
+
+    // busco el maximo de las 9 posibilidades
+    int max = nuevos_poner_en_c;
+    Coord max_coord = c;
+    for (int i = 0; i < podrian_amenazar.size(); i++) {
+        if (nuevos_podrian_amenazar[i] > max) {
+            max = nuevos_podrian_amenazar[i];
+            max_coord = podrian_amenazar[i];
         }
     }
 
-    if (vacia.first == -1 && vacia.second == -1) {
-        // no hay celdas por evaluar: el tablero es invalido o el tablero es una solucion
-        return check(p, n);
-    }
-
-    p[vacia.first][vacia.second] = 0;
-    int k1 = resolverAux(p, n, vacia);
-
-    p[vacia.first][vacia.second] = 1;
-    int k2 = resolverAux(p, n, vacia);
-    if (k1 < k2) {
-        p[vacia.first][vacia.second] = 0;
-        return k1;
-    } else {
-        p[vacia.first][vacia.second] = 1;
-        return k2;
-    }
+    agregarCaballo(p, n, max_coord.first, max_coord.second);
+    //mostrar(p, n);
+    //cout << endl;
+    // vuelvo a pasar c, porque puede haber posiciones entre c y max_coord que no estan rellenadas
+    resolverAux(p, n, c);
+    return 0;
 }
 
 bool amenazada(Tablero& p, int n, Coord c) {
