@@ -23,6 +23,7 @@ typedef vector<Signal> Vec;
 // Prototipado de funciones
 Vec mergeSort(vector<Signal>& vec);
 Vec merge(Vec &vec, Vec& izq,  Vec& der);
+void mergeAux(Vec& menor, Vec& mayor, int& i, int& j,Vec& result);
 void mostrar(const Vec& v);
 void mostrarPrueba(const Vec& v);
 
@@ -94,101 +95,16 @@ Vec merge(Vec &vec, Vec& izq,  Vec& der)
 {
     Vec result;
     int izq_it = 0, der_it = 0;
-    int aux;
-    bool flag = false;
  
     while(izq_it < izq.size() && der_it < der.size())
     {
         if(izq[izq_it].principio <= der[der_it].principio)
         {
-        	if(izq[izq_it].costo <= der[der_it].costo)
-        	{
-        		if(der[der_it].principio <= izq[izq_it].fin)
-        		{
-        			der[der_it].principio = izq[izq_it].fin;
-        		}
-        		if(der[der_it].principio >= der[der_it].fin)
-        		{
-        			der_it++;
-        			flag = true;
-        		}
-        		if(!flag)
-        		{
-        			result.push_back(izq[izq_it]);
-            		izq_it++;
-        		}
-        		else
-        		{
-        			flag = false;
-        		}
-        	}
-        	else
-    		{
-    			aux = izq[izq_it].fin;
-    			if(der[der_it].principio <= izq[izq_it].fin)
-    			{
-    				izq[izq_it].fin = der[der_it].principio;
-    			}
-       			if(izq[izq_it].fin > izq[izq_it].principio)
-    			{
-    				result.push_back(izq[izq_it]);
-    			}
-    			if(der[der_it].fin < aux)
-    			{
-	    			izq[izq_it].principio = der[der_it].fin;
-	    			izq[izq_it].fin = aux;    				
-    			}
-    			else
-    			{
-    				izq_it++;
-    			}
-    		}
-
+        	mergeAux(izq,der,izq_it,der_it,result);
         }
         else
         {
-            if(der[der_it].costo <= izq[izq_it].costo)
-        	{
-         		if(izq[izq_it].principio <= der[der_it].fin)
-        		{
-        			izq[izq_it].principio = der[der_it].fin;
-        		}       		       		
-        		if(izq[izq_it].principio >= izq[izq_it].fin)
-        		{
-        			izq_it++;
-        			flag = true;
-        		}
-        		if(!flag)
-        		{
-        			result.push_back(der[der_it]);
-            		der_it++;           		
-        		}
-        		else
-        		{
-        			flag = false;
-        		}       		
-        	}
-        	else
-    		{
-    			aux = der[der_it].fin;
-     			if(izq[izq_it].principio <= der[der_it].fin)
-    			{
-    				der[der_it].fin = izq[izq_it].principio;
-    			}    			
-    			if(izq[izq_it].fin > izq[izq_it].principio)
-    			{
-    				result.push_back(der[der_it]);
-    			}
-    			if(izq[izq_it].fin < aux)
-    			{
-					der[der_it].principio = izq[izq_it].fin;
-    				der[der_it].fin = aux;   				
-    			}
-    			else
-    			{
-    				der_it++;
-    			}  			
-    		}
+            mergeAux(der,izq,der_it,izq_it,result);
         }
     }
  
@@ -250,4 +166,51 @@ void mostrarPrueba(const Vec& v)
 		
 		cout << endl;
 	}
+}
+
+void mergeAux(Vec& menor, Vec& mayor, int& i, int& j,Vec& result)
+{
+    bool flag = false;
+    if(menor[i].costo <= mayor[j].costo)
+        {
+            if(mayor[j].principio <= menor[i].fin)
+            {
+                mayor[j].principio = menor[i].fin;
+            }
+            if(mayor[j].principio >= mayor[j].fin)
+            {
+                j++;
+                flag = true;
+            }
+            if(!flag)
+            {
+                result.push_back(menor[i]);
+                i++;
+            }
+            else
+            {
+                flag = false;
+            }
+        }
+        else
+        {
+            int aux = menor[i].fin;
+            if(mayor[j].principio <= menor[i].fin)
+            {
+                menor[i].fin = mayor[j].principio;
+            }
+            if(menor[i].fin > menor[i].principio)
+            {
+                result.push_back(menor[i]);
+            }
+            if(mayor[j].fin < aux)
+            {
+                menor[i].principio = mayor[j].fin;
+                menor[i].fin = aux;                  
+            }
+            else
+            {
+                i++;
+            }
+        }
 }
