@@ -26,3 +26,9 @@
 *.exe
 *.out
 *.app
+
+#Mac
+*.DS_Store
+
+#Ubuntu
+*.swp

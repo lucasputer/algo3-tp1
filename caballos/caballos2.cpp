@@ -1,17 +1,33 @@
 #include <utility>
 #include <vector>
 #include <iostream>
+#include <queue>
+
 using namespace std;
 
 // Varios typedefs
 typedef vector<int> Vec;
 typedef vector<Vec> Tablero;
 typedef pair<int, int> Coord;
+struct CoordEsp {
+
+    int cant;
+    Coord c;
+
+    CoordEsp(int n, Coord d) : cant(n), c(d) { }
+
+    bool operator<(const struct CoordEsp& other) const {
+        //Como ordena el MaxHeap
+        return cant < other.cant;
+    }
+};
 
 // Prototipado de funciones
 int resolver(Tablero& p, int n, int cant_caballos);
 int aux_resolver(Tablero& p, int n, Coord anterior, int cant_caballos, Tablero& t_optimo, int c_optimo, Tablero& original);
 bool agregar_caballo(Tablero& p, int n, int f, int c);
+int sim_agregar_caballo(Tablero& p, int n, int f, int c);
+int cota_goloso(Tablero& p, int n, Coord c, int caballos);
 vector<Coord> coordenadas_amenazadas(Tablero& p, int n, int f, int c);
 vector<Coord> nuevas_coordenadas_amenazadas(Tablero& p, int n, int f, int c);
 vector<Coord> aux_coordenadas_amenazadas(Tablero& p, int n, int f, int c, bool dame_todas);
@@ -155,9 +171,13 @@ Z: la solucion que esta siendo calculada tiene >= caballos que la solucion optim
 int resolver(Tablero& p, int n, int cant_caballos)
 {
 	Coord principio(0, 0);
-	Tablero optimo(n, Vec(n, 1));
+    Tablero optimo(n, Vec(n, 1));
+    // calculo una primera cota con un algoritmo goloso
+	Tablero aux = p;
+    int cota = cota_goloso(aux, n, principio, cant_caballos);
+    cout << cota << endl;
 	Tablero original = p;
-	int sol = aux_resolver(p, n, principio, cant_caballos, optimo, n*n, original);
+	int sol = aux_resolver(p, n, principio, cant_caballos, optimo, cota, original);
 	cout << "Tablero optimo: " << endl;
 	mostrar(optimo);
 	return sol;
@@ -282,3 +302,49 @@ int aux_resolver(Tablero& p, int n, Coord actual, int cant_caballos, Tablero& t_
 	return sol2;
 }
 
+int sim_agregar_caballo(Tablero& p, int n, int f, int c) {
+    vector<Coord> cam = nuevas_coordenadas_amenazadas(p, n, f, c);
+    return cam.size();
+}
+
+int cota_goloso(Tablero& p, int n, Coord c, int caballos) {
+    // Encuentro proxima coordenada a rellenar
+    bool encontroActual = p[c.first][c.second] == 0;
+    while (c.first < n && !encontroActual) {
+        if (c.second < n-1){
+            c.second++;
+        } else {
+            c.second = 0;
+            c.first = c.first + 1;
+        }
+        if (c.first < n && p[c.first][c.second] == 0)
+            encontroActual = true;
+    }
+    // Si no encontro un actual, ya no hay mas nada para completar 
+    // (es precondicion que el tablero 'p' sea valido)
+    if (!encontroActual) {
+        // cuento la cantidad de caballos usados
+        return caballos;
+    }
+
+    // me fijo cuales son los casilleros que podrian amenazar a la celda c
+    vector<Coord> podrian_amenazar = nuevas_coordenadas_amenazadas(p, n, c.first, c.second);
+    // cuento cuantos casilleros vacios poniendo un caballo nuevo en cada una de las posibilidades (maximo 9 contando c)
+    int nuevos_poner_en_c = sim_agregar_caballo(p, n, c.first, c.second);
+    Vec nuevos_podrian_amenazar = Vec(podrian_amenazar.size(), 0);
+    for (int i = 0; i < podrian_amenazar.size(); i++) {
+        nuevos_podrian_amenazar[i] = sim_agregar_caballo(p, n, podrian_amenazar[i].first, podrian_amenazar[i].first);
+    }
+
+    // ordeno las 9 posibilidades de mayor a menor usando un heap
+    priority_queue<CoordEsp> heap;
+    heap.push(CoordEsp(nuevos_poner_en_c, c));
+    for (int i = 0; i < podrian_amenazar.size(); i++) {
+        heap.push(CoordEsp(nuevos_podrian_amenazar[i], podrian_amenazar[i]));
+    }
+
+    // uso la posiblidad que minimiza los caballos usados
+    CoordEsp ce = heap.top();
+    agregar_caballo(p, n, ce.c.first, ce.c.second);
+    return cota_goloso(p, n, c, caballos + 1);
+}
