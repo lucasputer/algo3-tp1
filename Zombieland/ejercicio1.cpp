@@ -12,21 +12,14 @@ struct datoCiudad
     int cantSoldados;
     int indiceCiudad;
 
-    datoCiudad(int n1, int n2, int n3) : costoRescate(n1), cantSoldados(n2), indiceCiudad(n3)
-    {
-    }
+    datoCiudad(int n1, int n2, int n3) : costoRescate(n1), cantSoldados(n2), indiceCiudad(n3) {}
 
     bool operator<(const struct datoCiudad& other) const
     {
         //Como ordena el MinHeap
         return costoRescate > other.costoRescate;
     }
-
-
 };
-
-
-
 
 int main() {
     // El input puede estar vacio?
@@ -56,7 +49,6 @@ int main() {
         soldadosPorCiudad[i] = 0;
     }
 
-
     // Tomo los datos del input para generar el MinHeap
     for(int i = 1; i <= n; i++) {
         cin >> z;
@@ -75,7 +67,6 @@ int main() {
         } 
         // El MinHeap esta ordenado segun el costo de salvar cada ciudad (menor = mayor prioridad)
         infoCiudad.push(datoCiudad(costoActual,cantActual,indiceActual));
-
     }
 
     // Veo cuantas ciudades puedo salvar con el presupuesto asignado
@@ -88,9 +79,7 @@ int main() {
         soldadosPorCiudad[infoCiudad.top().indiceCiudad - 1] = infoCiudad.top().cantSoldados;
         P = P - infoCiudad.top().costoRescate;
         infoCiudad.pop();
-
     }
-
     
     // Genero el output, segun formato solicitado
     cout << ciudadesSalvadas << ' ';
@@ -99,7 +88,4 @@ int main() {
     }
     
     cout << endl;
- 
-
 }
-
