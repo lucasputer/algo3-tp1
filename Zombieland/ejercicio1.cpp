@@ -2,23 +2,21 @@
 #include <queue>
 #include <vector>
 #include <iostream>
-
 using namespace std;
+
 // Falta definir unos detalles de inputs y un testing intensivo.
 
-struct datoCiudad
-{
-    int costoRescate;
-    int cantSoldados;
-    int indiceCiudad;
-
+struct datoCiudad {
     datoCiudad(int n1, int n2, int n3) : costoRescate(n1), cantSoldados(n2), indiceCiudad(n3) {}
 
-    bool operator<(const struct datoCiudad& other) const
-    {
+    bool operator<(const struct datoCiudad& other) const {
         //Como ordena el MinHeap
         return costoRescate > other.costoRescate;
     }
+
+    int costoRescate;
+    int cantSoldados;
+    int indiceCiudad;
 };
 
 int main() {
@@ -64,7 +62,7 @@ int main() {
         if (cantActual < 0) {
             costoActual = 0;
             cantActual = 0;
-        } 
+        }
         // El MinHeap esta ordenado segun el costo de salvar cada ciudad (menor = mayor prioridad)
         infoCiudad.push(datoCiudad(costoActual,cantActual,indiceActual));
     }
@@ -80,12 +78,12 @@ int main() {
         P = P - infoCiudad.top().costoRescate;
         infoCiudad.pop();
     }
-    
+
     // Genero el output, segun formato solicitado
     cout << ciudadesSalvadas << ' ';
     for (int i = 0; i < soldadosPorCiudad.size(); i++) {
         cout << soldadosPorCiudad[i] << ' ';
     }
-    
+
     cout << endl;
 }

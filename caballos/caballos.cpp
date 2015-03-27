@@ -2,7 +2,6 @@
 #include <vector>
 #include <iostream>
 #include <queue>
-
 using namespace std;
 
 // Varios typedefs
@@ -10,15 +9,15 @@ typedef vector<int> Vec;
 typedef vector<Vec> Tablero;
 typedef pair<int, int> Coord;
 struct CoordEspecial {
-    int nuevas_amenazadas;
-    Coord c;
-
-    CoordEspecial(int n, Coord d) : nuevas_amenazadas(n), c(d) { }
+    CoordEspecial(int n, Coord d) : nuevas_amenazadas(n), c(d) {}
 
     bool operator<(const struct CoordEspecial& other) const {
         //Como ordena el MaxHeap
         return nuevas_amenazadas < other.nuevas_amenazadas;
     }
+
+    int nuevas_amenazadas;
+    Coord c;
 };
 
 // Prototipado de funciones
