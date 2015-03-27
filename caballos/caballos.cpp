@@ -22,7 +22,7 @@ struct CoordEspecial {
 
 // Prototipado de funciones
 int resolver(Tablero& p, int n, int cant_caballos);
-int aux_resolver(Tablero& p, int n, Coord anterior, int cant_caballos, Tablero& t_optimo, int c_optimo, Tablero& original);
+int aux_resolver(Tablero& p, int n, Coord anterior, int cant_caballos, Tablero& t_optimo, int c_optimo, Tablero& original, int cant_caballos_original);
 bool agregar_caballo(Tablero& p, int n, int f, int c);
 int cota_goloso(Tablero& p, int n, int caballos);
 vector<Coord> coordenadas_amenazadas(Tablero& p, int n, int f, int c);
@@ -170,7 +170,7 @@ int resolver(Tablero& p, int n, int cant_caballos) {
     Tablero original = p;
     // empiezo evaluando en el (0,0)
     Coord principio(0, 0);
-    int sol = aux_resolver(p, n, principio, cant_caballos, optimo, cota, original);
+    int sol = aux_resolver(p, n, principio, cant_caballos, optimo, cota, original, cant_caballos);
     cout << "Tablero optimo: " << endl;
     mostrar(optimo);
     return sol;
@@ -207,10 +207,10 @@ int resolver(Tablero& p, int n, int cant_caballos) {
  ** param int c_optimo: la cantidad de caballos de la mejor solucion encontrada hasta ahora.
  ** param Tablero& original: el tablero inicial.
  **/
-int aux_resolver(Tablero& p, int n, Coord actual, int cant_caballos, Tablero& t_optimo, int c_optimo, Tablero& original) {
+int aux_resolver(Tablero& p, int n, Coord actual, int cant_caballos, Tablero& t_optimo, int c_optimo, Tablero& original, int cant_caballos_original) {
     //Speedup para problemas que empiezan con Tablero vacio con n <= 10 :D
     int precomputed_solutions[] = {0,1,4,4,4,5,8,10,12,14,16};
-    if (n < 11 && c_optimo == precomputed_solutions[n])
+    if ((n < 11 && c_optimo == precomputed_solutions[n]) || cant_caballos >= precomputed_solutions[n] + cant_caballos_original)
         return c_optimo;
 
     //Poda caso Z
@@ -286,7 +286,7 @@ int aux_resolver(Tablero& p, int n, Coord actual, int cant_caballos, Tablero& t_
             p[ncam[i].first][ncam[i].second] = 2;
         }
 
-        int sol = aux_resolver(p, n, proxima_coordenada(p,n,actual), cant_caballos+1, t_optimo, c_optimo, original);
+        int sol = aux_resolver(p, n, proxima_coordenada(p,n,actual), cant_caballos+1, t_optimo, c_optimo, original, cant_caballos_original);
 
         //vuelvo todo a como estaba antes
         for (int i = 0; i < ncam.size(); i++) {
@@ -298,7 +298,7 @@ int aux_resolver(Tablero& p, int n, Coord actual, int cant_caballos, Tablero& t_
     }
     if (caso_A || caso_D) {
         // hay que dejar todo como estaba, obs: el caso D requiere que B y C no se cumplan
-        return aux_resolver(p, n, proxima_coordenada(p,n,actual), cant_caballos, t_optimo, c_optimo, original);
+        return aux_resolver(p, n, proxima_coordenada(p,n,actual), cant_caballos, t_optimo, c_optimo, original, cant_caballos_original);
     }
 
     //La coordenada actual puede ser 0 o 2 (porque seguro que no tiene un caballo) y tengo que comparar resoluciones
@@ -306,14 +306,14 @@ int aux_resolver(Tablero& p, int n, Coord actual, int cant_caballos, Tablero& t_
     int valor_anterior = p[actual.first][actual.second];
 
     //Veo las soluciones dejando la coordenada como estaba
-    int sol1 = aux_resolver(p, n, proxima_coordenada(p,n,actual), cant_caballos, t_optimo, c_optimo, original);
+    int sol1 = aux_resolver(p, n, proxima_coordenada(p,n,actual), cant_caballos, t_optimo, c_optimo, original, cant_caballos_original);
 
     //Veo las soluciones poniendo un caballo en la coordenada
     p[actual.first][actual.second] = 1;
     for (int i = 0; i < ncam.size(); i++) {
         p[ncam[i].first][ncam[i].second] = 2;
     }
-    int sol2 = aux_resolver(p, n, proxima_coordenada(p,n,actual), cant_caballos+1, t_optimo, sol1, original);
+    int sol2 = aux_resolver(p, n, proxima_coordenada(p,n,actual), cant_caballos+1, t_optimo, sol1, original, cant_caballos_original);
     //obs: el sol1 aca es clave, porque compara las soluciones de los dos casos
 
     //vuelvo todo a como estaba
