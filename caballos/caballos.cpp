@@ -166,7 +166,7 @@ int resolver(Tablero& p, int n, int cant_caballos) {
     // calculo una primera cota para el tablero optimo con un algoritmo goloso
     Tablero optimo = p;
     int cota = cota_goloso(optimo, n, cant_caballos);
-    cout << cota << endl;
+    cout << "Cota algoritmo goloso: " << cota << endl;
     // guardo el tablero original para saber cuales eran los caballos que venian al principio
     Tablero original = p;
     // empiezo evaluando en el (0,0)
