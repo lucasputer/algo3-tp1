@@ -198,6 +198,9 @@ int resolver(Tablero& p, int n, int cant_caballos) {
  * => tengo que dejar la posicion actual en 2
  * G : el primer tablero optimo lo calculamos con un goloso
  * Z: la solucion que esta siendo calculada tiene >= caballos que la solucion optima actual
+ * S: speedup para problemas con Tablero de n <= 10. La solución que esta siendo calculada tiene
+ *    mas caballos que la cantidad de caballos de la solucion optima + la cantidad de caballos en el tablero inicial,
+ *    o tiene exactamente la cantidad de caballos de la solucion optima.
  *
  * param Tablero& p: el tablero a evaluar
  * param int n: el tamaño del tablero (p.size() = n y p[i].size() == n, con 0<=i<n)
@@ -208,7 +211,7 @@ int resolver(Tablero& p, int n, int cant_caballos) {
  * param Tablero& original: el tablero inicial.
  */
 int aux_resolver(Tablero& p, int n, Coord actual, int cant_caballos, Tablero& t_optimo, int c_optimo, Tablero& original, int cant_caballos_original) {
-    //Speedup para problemas que empiezan con Tablero vacio con n <= 10 :D
+    //Poda caso S
     int precomputed_solutions[] = {0,1,4,4,4,5,8,10,12,14,16};
     if ((n < 11 && c_optimo == precomputed_solutions[n]) || cant_caballos >= precomputed_solutions[n] + cant_caballos_original)
         return c_optimo;
