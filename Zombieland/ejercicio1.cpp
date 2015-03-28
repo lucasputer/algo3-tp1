@@ -4,12 +4,10 @@
 #include <iostream>
 using namespace std;
 
-// Falta definir unos detalles de inputs y un testing intensivo.
-
 struct datoCiudad {
-    
+
     datoCiudad() : costoRescate(0), cantSoldados(0), indiceCiudad(0) {}
-    
+
     datoCiudad(int n1, int n2, int n3) : costoRescate(n1), cantSoldados(n2), indiceCiudad(n3) {}
 
     bool operator<(const struct datoCiudad& other) const {
@@ -22,6 +20,7 @@ struct datoCiudad {
     int indiceCiudad;
 };
 
+// Implementacion. Contiene el cargado de input más la resolución del ejercicio.
 int main() {
     // Cantidad de Ciudades
     int n;
