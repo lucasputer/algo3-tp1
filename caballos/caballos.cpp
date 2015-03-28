@@ -63,14 +63,14 @@ int main() {
 }
 
 /**
- ** Agrega un caballo al Tablero dado.
- **
- ** Codigos de celdas:
- ** -----------------
- ** 0 : no tiene caballo ni esta amenazada
- ** 1 : tiene un caballo
- ** 2 : no tiene un caballo y esta amenazada
- **/
+ * Agrega un caballo al Tablero dado.
+ *
+ * Codigos de celdas:
+ * -----------------
+ * 0 : no tiene caballo ni esta amenazada
+ * 1 : tiene un caballo
+ * 2 : no tiene un caballo y esta amenazada
+ */
 bool agregar_caballo(Tablero& p, int n, int f, int c) {
     //Check si (f,c) invalida o ya tiene un caballo
     if (f < 0 || f >= n || c < 0 || c >= n || p[f][c] == 1)
@@ -88,23 +88,23 @@ bool agregar_caballo(Tablero& p, int n, int f, int c) {
 }
 
 /**
- ** Devuelve todas las coordenadas que pueden ser amenazadas desde un casillero.
- **/
+ * Devuelve todas las coordenadas que pueden ser amenazadas desde un casillero.
+ */
 vector<Coord> coordenadas_amenazadas(Tablero& p, int n, int f, int c) {
     return aux_coordenadas_amenazadas(p,n,f,c,true);
 }
 
 /**
- ** Devuelve todas las coordenadas que pueden ser amenazadas desde un casillero,
- ** y no están ya amenazadas o tienen un caballo.
- **/
+ * Devuelve todas las coordenadas que pueden ser amenazadas desde un casillero,
+ * y no están ya amenazadas o tienen un caballo.
+ */
 vector<Coord> nuevas_coordenadas_amenazadas(Tablero& p, int n, int f, int c) {
     return aux_coordenadas_amenazadas(p,n,f,c,false);
 }
 
 /**
- ** Funcion auxiliar que calcula coordenadas amenazadas.
- **/
+ * Funcion auxiliar que calcula coordenadas amenazadas.
+ */
 vector<Coord> aux_coordenadas_amenazadas(Tablero& p, int n, int f, int c, bool dame_todas) {
     vector<Coord> solution;
     solution.reserve(8);
@@ -122,8 +122,8 @@ vector<Coord> aux_coordenadas_amenazadas(Tablero& p, int n, int f, int c, bool d
 }
 
 /**
- ** Dada una coordenada, devuelve la proxima que no vale 1 o una invalida
- **/
+ * Dada una coordenada, devuelve la proxima que no vale 1 o una invalida
+ */
 Coord proxima_coordenada(Tablero& p, int n, Coord actual) {
     bool encontro_proxima = false;
     while (actual.first < n && !encontro_proxima){
@@ -140,8 +140,8 @@ Coord proxima_coordenada(Tablero& p, int n, Coord actual) {
 }
 
 /**
- ** Imprime un tablero por stdout.
- **/
+ * Imprime un tablero por stdout.
+ */
 void mostrar(const Tablero& m) {
     cout << endl;
     int n = m.size();
@@ -155,12 +155,12 @@ void mostrar(const Tablero& m) {
 }
 
 /**
- ** Encuentra el tablero optimo que minimiza la cantidad de caballos utilizados.
- **
- ** param Tablero& p: el tablero inicial
- ** param int n: el tamaño del tablero (p.size() = n y p[i].size() == n, con 0<=i<n)
- ** param int cant_caballos: la cantidad de caballos utilizados en el tablero inicial
- **/
+ * Encuentra el tablero optimo que minimiza la cantidad de caballos utilizados.
+ *
+ * param Tablero& p: el tablero inicial
+ * param int n: el tamaño del tablero (p.size() = n y p[i].size() == n, con 0<=i<n)
+ * param int cant_caballos: la cantidad de caballos utilizados en el tablero inicial
+ */
 int resolver(Tablero& p, int n, int cant_caballos) {
     // calculo una primera cota para el tablero optimo con un algoritmo goloso
     Tablero optimo = p;
@@ -177,36 +177,36 @@ int resolver(Tablero& p, int n, int cant_caballos) {
 }
 
 /**
- ** Función auxiliar que evalua un Tablero y se vuelve a llamar de forma recursiva
- ** luego de tomar una decisison con respecto al siguiente casillero a evaluar.
- ** La decision puede ser: dejar el casillero vacio (para amenazarlo más adelante) o
- ** poner un caballo en el casillero.
- **
- ** Casos de poda:
- ** -------------
- ** A : todas las posiciones amenazadas por el actual estan en 1 o 2 y alguna tiene un 1
- ** => tengo que dejar la posicion actual en 2
- ** B : existe alguna posicion amenazada que ya fue procesada, tiene un 0 y solo la puede
- ** amenazar la posicion actual (todas las posiciones que pueden amenazar a la amenazada
- ** ya fueron procesadas y ninguna tiene un caballo) obs: clave para la correctitud
- ** => tengo que poner un 1 en la posicion actual
- ** C : todas las posiciones amenazadas ya fueron procesadas y ninguna tiene un 1 (ej: centro 3x3)
- ** obs: clave para la correctitud
- ** => tengo que poner un 1 en la posicion actual
- ** D : existe una posicion amenazada que tiene caballo y, a la vez, todas sus posiciones
- ** amenazadas que no son la actual tienen caballo. Ademas, no se deben cumplir B o C
- ** => tengo que dejar la posicion actual en 2
- ** G : el primer tablero optimo lo calculamos con un goloso
- ** Z: la solucion que esta siendo calculada tiene >= caballos que la solucion optima actual
- **
- ** param Tablero& p: el tablero a evaluar
- ** param int n: el tamaño del tablero (p.size() = n y p[i].size() == n, con 0<=i<n)
- ** param Coord actual: el último casillero evaluado antes de la llamada recursiva.
- ** param int cant_caballos: la cantidad de caballos utilizados para el tablero dado.
- ** param Tablero& t_optimo: el tablero de la mejor solucion encontrada hasta ahora.
- ** param int c_optimo: la cantidad de caballos de la mejor solucion encontrada hasta ahora.
- ** param Tablero& original: el tablero inicial.
- **/
+ * Función auxiliar que evalua un Tablero y se vuelve a llamar de forma recursiva
+ * luego de tomar una decisison con respecto al siguiente casillero a evaluar.
+ * La decision puede ser: dejar el casillero vacio (para amenazarlo más adelante) o
+ * poner un caballo en el casillero.
+ *
+ * Casos de poda:
+ * -------------
+ * A : todas las posiciones amenazadas por el actual estan en 1 o 2 y alguna tiene un 1
+ * => tengo que dejar la posicion actual en 2
+ * B : existe alguna posicion amenazada que ya fue procesada, tiene un 0 y solo la puede
+ * amenazar la posicion actual (todas las posiciones que pueden amenazar a la amenazada
+ * ya fueron procesadas y ninguna tiene un caballo) obs: clave para la correctitud
+ * => tengo que poner un 1 en la posicion actual
+ * C : todas las posiciones amenazadas ya fueron procesadas y ninguna tiene un 1 (ej: centro 3x3)
+ * obs: clave para la correctitud
+ * => tengo que poner un 1 en la posicion actual
+ * D : existe una posicion amenazada que tiene caballo y, a la vez, todas sus posiciones
+ * amenazadas que no son la actual tienen caballo. Ademas, no se deben cumplir B o C
+ * => tengo que dejar la posicion actual en 2
+ * G : el primer tablero optimo lo calculamos con un goloso
+ * Z: la solucion que esta siendo calculada tiene >= caballos que la solucion optima actual
+ *
+ * param Tablero& p: el tablero a evaluar
+ * param int n: el tamaño del tablero (p.size() = n y p[i].size() == n, con 0<=i<n)
+ * param Coord actual: el último casillero evaluado antes de la llamada recursiva.
+ * param int cant_caballos: la cantidad de caballos utilizados para el tablero dado.
+ * param Tablero& t_optimo: el tablero de la mejor solucion encontrada hasta ahora.
+ * param int c_optimo: la cantidad de caballos de la mejor solucion encontrada hasta ahora.
+ * param Tablero& original: el tablero inicial.
+ */
 int aux_resolver(Tablero& p, int n, Coord actual, int cant_caballos, Tablero& t_optimo, int c_optimo, Tablero& original, int cant_caballos_original) {
     //Speedup para problemas que empiezan con Tablero vacio con n <= 10 :D
     int precomputed_solutions[] = {0,1,4,4,4,5,8,10,12,14,16};
@@ -326,15 +326,15 @@ int aux_resolver(Tablero& p, int n, Coord actual, int cant_caballos, Tablero& t_
 }
 
 /**
- ** Función auxiliar que evalua un Tablero y calcula una primer cota para la
- ** cantidad de caballos necesarios para armar una solución.
- ** La cota calculada se obtiene utilizando un algoritmo goloso que maximiza a
- ** cada paso la cantidad de posiciones amenazadas con el nuevo caballo.
- **
- ** param Tablero& p: el tablero a evaluar
- ** param int n: el tamaño del tablero (p.size() = n y p[i].size() == n, con 0<=i<n)
- ** param int caballos: la cantidad de caballos utilizados para el tablero dado.
- **/
+ * Función auxiliar que evalua un Tablero y calcula una primer cota para la
+ * cantidad de caballos necesarios para armar una solución.
+ * La cota calculada se obtiene utilizando un algoritmo goloso que maximiza a
+ * cada paso la cantidad de posiciones amenazadas con el nuevo caballo.
+ *
+ * param Tablero& p: el tablero a evaluar
+ * param int n: el tamaño del tablero (p.size() = n y p[i].size() == n, con 0<=i<n)
+ * param int caballos: la cantidad de caballos utilizados para el tablero dado.
+ */
 int cota_goloso(Tablero& p, int n, int caballos) {
     // Encuentro proxima coordenada a rellenar
     Coord c = Coord(-1,-1);
