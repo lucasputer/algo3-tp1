@@ -50,8 +50,11 @@ int main() {
     for(int i = 0; i < k; i++){
         int f, c;
         cin >> f >> c;
-        if (agregar_caballo(p, f, c) == true)
+        f--;
+        c--;
+        if (agregar_caballo(p, f, c) == true) {
             cant_caballos++;
+        }
     }
 
     int sol = resolver(p,cant_caballos);
@@ -78,7 +81,7 @@ bool agregar_caballo(Tablero& p, int f, int c) {
     //Agrego un caballo a (f,c)
     p[f][c] = 1;
     //Marco las posiciones amenazadas
-    vector<Coord> cam = coordenadas_amenazadas(p, f, c);
+    vector<Coord> cam = nuevas_coordenadas_amenazadas(p, f, c);
     for (int i = 0; i < cam.size(); i++) {
         Coord crd = cam[i];
         if (p[crd.first][crd.second] != 1) // si no tiene un caballo
