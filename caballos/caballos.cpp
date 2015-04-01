@@ -21,14 +21,14 @@ struct CoordEspecial {
 };
 
 // Prototipado de funciones
-int resolver(Tablero& p, int n, int cant_caballos);
-int aux_resolver(Tablero& p, int n, Coord anterior, int cant_caballos, Tablero& t_optimo, int c_optimo, Tablero& original, int cant_caballos_original);
-bool agregar_caballo(Tablero& p, int n, int f, int c);
-int cota_goloso(Tablero& p, int n, int caballos);
-vector<Coord> coordenadas_amenazadas(Tablero& p, int n, int f, int c);
-vector<Coord> nuevas_coordenadas_amenazadas(Tablero& p, int n, int f, int c);
-vector<Coord> aux_coordenadas_amenazadas(Tablero& p, int n, int f, int c, bool dame_todas);
-Coord proxima_coordenada(Tablero& p, int n, Coord actual);
+int resolver(Tablero& p, int cant_caballos);
+int aux_resolver(Tablero& p, Coord anterior, int cant_caballos, int c_optimo, Tablero& original, int cant_caballos_original);
+bool agregar_caballo(Tablero& p, int f, int c);
+int cota_goloso(Tablero& p, int caballos);
+vector<Coord> coordenadas_amenazadas(Tablero& p, int f, int c);
+vector<Coord> nuevas_coordenadas_amenazadas(Tablero& p, int f, int c);
+vector<Coord> aux_coordenadas_amenazadas(Tablero& p, int f, int c, bool dame_todas);
+Coord proxima_coordenada(Tablero& p, Coord actual);
 void mostrar(const Tablero& m);
 
 // Implementacion
@@ -51,11 +51,11 @@ int main() {
         for(int i = 0; i < k; i++){
             int f, c;
             cin >> f >> c;
-            if (agregar_caballo(p, n, f, c) == true)
+            if (agregar_caballo(p, f, c) == true)
                 cant_caballos++;
         }
 
-        int sol = resolver(p,n,cant_caballos);
+        int sol = resolver(p,cant_caballos);
         cout << endl << "El tablero optimo tiene " << sol << " caballos." << endl;
     }
 
@@ -71,14 +71,15 @@ int main() {
  * 1 : tiene un caballo
  * 2 : no tiene un caballo y esta amenazada
  */
-bool agregar_caballo(Tablero& p, int n, int f, int c) {
+bool agregar_caballo(Tablero& p, int f, int c) {
+    int n = p.size();
     //Check si (f,c) invalida o ya tiene un caballo
     if (f < 0 || f >= n || c < 0 || c >= n || p[f][c] == 1)
         return false;
     //Agrego un caballo a (f,c)
     p[f][c] = 1;
     //Marco las posiciones amenazadas
-    vector<Coord> cam = coordenadas_amenazadas(p, n, f, c);
+    vector<Coord> cam = coordenadas_amenazadas(p, f, c);
     for (int i = 0; i < cam.size(); i++) {
         Coord crd = cam[i];
         if (p[crd.first][crd.second] != 1) // si no tiene un caballo
@@ -90,22 +91,23 @@ bool agregar_caballo(Tablero& p, int n, int f, int c) {
 /**
  * Devuelve todas las coordenadas que pueden ser amenazadas desde un casillero.
  */
-vector<Coord> coordenadas_amenazadas(Tablero& p, int n, int f, int c) {
-    return aux_coordenadas_amenazadas(p,n,f,c,true);
+vector<Coord> coordenadas_amenazadas(Tablero& p, int f, int c) {
+    return aux_coordenadas_amenazadas(p,f,c,true);
 }
 
 /**
  * Devuelve todas las coordenadas que pueden ser amenazadas desde un casillero,
  * y no están ya amenazadas o tienen un caballo.
  */
-vector<Coord> nuevas_coordenadas_amenazadas(Tablero& p, int n, int f, int c) {
-    return aux_coordenadas_amenazadas(p,n,f,c,false);
+vector<Coord> nuevas_coordenadas_amenazadas(Tablero& p, int f, int c) {
+    return aux_coordenadas_amenazadas(p,f,c,false);
 }
 
 /**
  * Funcion auxiliar que calcula coordenadas amenazadas.
  */
-vector<Coord> aux_coordenadas_amenazadas(Tablero& p, int n, int f, int c, bool dame_todas) {
+vector<Coord> aux_coordenadas_amenazadas(Tablero& p, int f, int c, bool dame_todas) {
+    int n = p.size();
     vector<Coord> solution;
     solution.reserve(8);
     Coord offsets[] = {	make_pair(-1, 2),make_pair(2, -1),
@@ -124,7 +126,8 @@ vector<Coord> aux_coordenadas_amenazadas(Tablero& p, int n, int f, int c, bool d
 /**
  * Dada una coordenada, devuelve la proxima que no vale 1 o una invalida
  */
-Coord proxima_coordenada(Tablero& p, int n, Coord actual) {
+Coord proxima_coordenada(Tablero& p, Coord actual) {
+    int n = p.size();
     bool encontro_proxima = false;
     while (actual.first < n && !encontro_proxima){
         if (actual.second < n-1){
@@ -161,18 +164,17 @@ void mostrar(const Tablero& m) {
  * param int n: el tamaño del tablero (p.size() = n y p[i].size() == n, con 0<=i<n)
  * param int cant_caballos: la cantidad de caballos utilizados en el tablero inicial
  */
-int resolver(Tablero& p, int n, int cant_caballos) {
+int resolver(Tablero& p, int cant_caballos) {
     // calculo una primera cota para el tablero optimo con un algoritmo goloso
     Tablero optimo = p;
-    int cota = cota_goloso(optimo, n, cant_caballos);
+    int cota = cota_goloso(optimo, cant_caballos);
     cout << "Cota algoritmo goloso: " << cota << endl;
     // guardo el tablero original para saber cuales eran los caballos que venian al principio
     Tablero original = p;
     // empiezo evaluando en el (0,0)
     Coord principio(0, 0);
-    int sol = aux_resolver(p, n, principio, cant_caballos, optimo, cota, original, cant_caballos);
-    cout << "Tablero optimo: " << endl;
-    mostrar(optimo);
+    int sol = aux_resolver(p, principio, cant_caballos, cota, original, cant_caballos);
+    cout << sol << endl;
     return sol;
 }
 
@@ -203,14 +205,13 @@ int resolver(Tablero& p, int n, int cant_caballos) {
  *    o tiene exactamente la cantidad de caballos de la solucion optima.
  *
  * param Tablero& p: el tablero a evaluar
- * param int n: el tamaño del tablero (p.size() = n y p[i].size() == n, con 0<=i<n)
  * param Coord actual: el último casillero evaluado antes de la llamada recursiva.
  * param int cant_caballos: la cantidad de caballos utilizados para el tablero dado.
- * param Tablero& t_optimo: el tablero de la mejor solucion encontrada hasta ahora.
  * param int c_optimo: la cantidad de caballos de la mejor solucion encontrada hasta ahora.
  * param Tablero& original: el tablero inicial.
  */
-int aux_resolver(Tablero& p, int n, Coord actual, int cant_caballos, Tablero& t_optimo, int c_optimo, Tablero& original, int cant_caballos_original) {
+int aux_resolver(Tablero& p, Coord actual, int cant_caballos, int c_optimo, Tablero& original, int cant_caballos_original) {
+    int n = p.size();
     //Poda caso S
     int precomputed_solutions[] = {0,1,4,4,4,5,8,10,12,14,16};
     if (n < 11 && (c_optimo == precomputed_solutions[n] || cant_caballos > precomputed_solutions[n] + cant_caballos_original))
@@ -222,12 +223,11 @@ int aux_resolver(Tablero& p, int n, Coord actual, int cant_caballos, Tablero& t_
 
     //Encuentro proxima coordenada a rellenar
     if (actual.first < n && p[actual.first][actual.second] == 1)
-        actual = proxima_coordenada(p, n, actual);
+        actual = proxima_coordenada(p, actual);
 
     //Si no encontro un actual, ya no hay mas nada para completar
     if (actual.first == n) {
         if (cant_caballos < c_optimo) {
-            t_optimo = p;
             return cant_caballos;
         } else {
             return c_optimo;
@@ -235,7 +235,7 @@ int aux_resolver(Tablero& p, int n, Coord actual, int cant_caballos, Tablero& t_
     }
 
     //Sino, veamos...
-    vector<Coord> cam = coordenadas_amenazadas(p, n, actual.first, actual.second);
+    vector<Coord> cam = coordenadas_amenazadas(p, actual.first, actual.second);
     bool caso_A = true, caso_B = false, caso_C = true, caso_D = false;
 
     for (int i = 0; i < cam.size() && !caso_B; i++) {
@@ -250,7 +250,7 @@ int aux_resolver(Tablero& p, int n, Coord actual, int cant_caballos, Tablero& t_
         }
         //check caso B de poda
         if (crd < actual && p[crd.first][crd.second] == 0) { // crd ya fue procesada y tiene un 0
-            vector<Coord> cam_crd = coordenadas_amenazadas(p, n, crd.first, crd.second);
+            vector<Coord> cam_crd = coordenadas_amenazadas(p, crd.first, crd.second);
             bool solo_la_puede_amenazar_actual = true;
             for (int j = 0; j < cam_crd.size() && solo_la_puede_amenazar_actual; j++) {
                 Coord crd2 = cam_crd[j];
@@ -262,7 +262,7 @@ int aux_resolver(Tablero& p, int n, Coord actual, int cant_caballos, Tablero& t_
         }
         //check caso D de poda
         if (p[crd.first][crd.second] == 1 && original[crd.first][crd.second] != 1) {
-            vector<Coord> cam_crd = coordenadas_amenazadas(p, n, crd.first, crd.second);
+            vector<Coord> cam_crd = coordenadas_amenazadas(p, crd.first, crd.second);
             bool todas_menos_actual_la_amenazan = true;
             for (int j = 0; j < cam_crd.size() && todas_menos_actual_la_amenazan; j++) {
                 Coord crd2 = cam_crd[j];
@@ -281,7 +281,7 @@ int aux_resolver(Tablero& p, int n, Coord actual, int cant_caballos, Tablero& t_
     if (caso_B || caso_C) {
         // si o si hay que poner un caballo
         int valor_anterior = p[actual.first][actual.second];
-        vector<Coord> ncam = nuevas_coordenadas_amenazadas(p, n, actual.first, actual.second);
+        vector<Coord> ncam = nuevas_coordenadas_amenazadas(p, actual.first, actual.second);
         p[actual.first][actual.second] = 1;
 
         // seteo como amenazadas, las coordenadas que estan en 0 y puedo amenazar
@@ -289,7 +289,7 @@ int aux_resolver(Tablero& p, int n, Coord actual, int cant_caballos, Tablero& t_
             p[ncam[i].first][ncam[i].second] = 2;
         }
 
-        int sol = aux_resolver(p, n, proxima_coordenada(p,n,actual), cant_caballos+1, t_optimo, c_optimo, original, cant_caballos_original);
+        int sol = aux_resolver(p, proxima_coordenada(p,actual), cant_caballos+1, c_optimo, original, cant_caballos_original);
 
         //vuelvo todo a como estaba antes
         for (int i = 0; i < ncam.size(); i++) {
@@ -301,22 +301,22 @@ int aux_resolver(Tablero& p, int n, Coord actual, int cant_caballos, Tablero& t_
     }
     if (caso_A || caso_D) {
         // hay que dejar todo como estaba, obs: el caso D requiere que B y C no se cumplan
-        return aux_resolver(p, n, proxima_coordenada(p,n,actual), cant_caballos, t_optimo, c_optimo, original, cant_caballos_original);
+        return aux_resolver(p, proxima_coordenada(p,actual), cant_caballos, c_optimo, original, cant_caballos_original);
     }
 
     //La coordenada actual puede ser 0 o 2 (porque seguro que no tiene un caballo) y tengo que comparar resoluciones
-    vector<Coord> ncam = nuevas_coordenadas_amenazadas(p, n, actual.first, actual.second);
+    vector<Coord> ncam = nuevas_coordenadas_amenazadas(p, actual.first, actual.second);
     int valor_anterior = p[actual.first][actual.second];
 
     //Veo las soluciones dejando la coordenada como estaba
-    int sol1 = aux_resolver(p, n, proxima_coordenada(p,n,actual), cant_caballos, t_optimo, c_optimo, original, cant_caballos_original);
+    int sol1 = aux_resolver(p, proxima_coordenada(p,actual), cant_caballos, c_optimo, original, cant_caballos_original);
 
     //Veo las soluciones poniendo un caballo en la coordenada
     p[actual.first][actual.second] = 1;
     for (int i = 0; i < ncam.size(); i++) {
         p[ncam[i].first][ncam[i].second] = 2;
     }
-    int sol2 = aux_resolver(p, n, proxima_coordenada(p,n,actual), cant_caballos+1, t_optimo, sol1, original, cant_caballos_original);
+    int sol2 = aux_resolver(p, proxima_coordenada(p,actual), cant_caballos+1, sol1, original, cant_caballos_original);
     //obs: el sol1 aca es clave, porque compara las soluciones de los dos casos
 
     //vuelvo todo a como estaba
@@ -338,7 +338,8 @@ int aux_resolver(Tablero& p, int n, Coord actual, int cant_caballos, Tablero& t_
  * param int n: el tamaño del tablero (p.size() = n y p[i].size() == n, con 0<=i<n)
  * param int caballos: la cantidad de caballos utilizados para el tablero dado.
  */
-int cota_goloso(Tablero& p, int n, int caballos) {
+int cota_goloso(Tablero& p, int caballos) {
+    int n = p.size();
     // Encuentro proxima coordenada a rellenar
     Coord c = Coord(-1,-1);
     for (int i = 0; i < n; i++) {
@@ -360,19 +361,19 @@ int cota_goloso(Tablero& p, int n, int caballos) {
 
     // vamos a ver si conviene poner un caballo en el casillero c,
     // o si conviene amenazarlo desde alguna otra posicion vacia
-    vector<Coord> ncam = nuevas_coordenadas_amenazadas(p, n, c.first, c.second);
+    vector<Coord> ncam = nuevas_coordenadas_amenazadas(p, c.first, c.second);
 
     // tengo que evaluar como maximo 9 posibilidades (el casillero actual + 8 que la pueden amenazar)
     // voy a usar un heap para ordenar estas posibilidades de mayor a menor
     priority_queue<CoordEspecial> heap;
     heap.push(CoordEspecial(ncam.size(), c));
     for (int i = 0; i < ncam.size(); i++) {
-        vector<Coord> ncam_aux = nuevas_coordenadas_amenazadas(p, n, ncam[i].first, ncam[i].second);
+        vector<Coord> ncam_aux = nuevas_coordenadas_amenazadas(p, ncam[i].first, ncam[i].second);
         heap.push(CoordEspecial(ncam_aux.size(), ncam[i]));
     }
 
     // uso la posiblidad que maximiza la cantidad de casilleros vacios amenazados
     CoordEspecial ce = heap.top();
-    agregar_caballo(p, n, ce.c.first, ce.c.second);
-    return cota_goloso(p, n, caballos + 1);
+    agregar_caballo(p, ce.c.first, ce.c.second);
+    return cota_goloso(p, caballos + 1);
 }
