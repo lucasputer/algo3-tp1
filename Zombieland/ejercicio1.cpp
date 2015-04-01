@@ -12,7 +12,7 @@ struct datoCiudad {
 
     bool operator<(const struct datoCiudad& other) const {
         //Como se ordena datoCiudad
-        return costoRescate <= other.costoRescate;
+        return costoRescate < other.costoRescate;
     }
 
     int costoRescate;
@@ -39,17 +39,12 @@ int main() {
     // Cantidad de Ciudades Salvadas
     int ciudadesSalvadas = 0;
     // Soldados enviados por Ciudad
-    vector<int> soldadosPorCiudad(n);
+    vector<int> soldadosPorCiudad(n, 0);
     // 1 Soldado = 10 zombies
     int minSoldados = 10;
 
-    // Inicializo el vector con 0.
-    for (int i = 0; i < n; i++) {
-        soldadosPorCiudad[i] = 0;
-    }
-
     // Tomo los datos del input para generar el MinHeap
-    for(int i = 1; i <= n; i++) {
+    for(int i = 0; i < n; i++) {
         cin >> z;
         cin >> s;
         cin >> c;
@@ -63,8 +58,8 @@ int main() {
             cantActual = 0;
         }
         // Completo el vector con los nuevos datos de cada ciudad
-        datoCiudad dato(costoActual, cantActual, i);
-        infoCiudad[i - 1] = dato;
+        datoCiudad dato(costoActual, cantActual, i+1);
+        infoCiudad[i] = dato;
     }
 
     // Ordeno el vector infoCiudad
