@@ -81,10 +81,10 @@ int main() {
     }
 
     // Genero el output, segun formato solicitado
-    cout << ciudadesSalvadas << ' ';
+    /*cout << ciudadesSalvadas << ' ';
     for (int i = 0; i < n; i++) {
         cout << soldadosPorCiudad[i] << ' ';
     }
-
-    cout << endl;
+    cout << endl;*/
+    cout << ciudadesSalvadas << endl;
 }
