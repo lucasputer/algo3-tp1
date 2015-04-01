@@ -36,28 +36,27 @@ int main() {
     int n;
     int k;
 
-    while(true) {
-        cin >> n;
-        if(cin.eof()){
-            break;
-        }
-        cin >> k;
-        if(cin.eof()){
-            break;
-        }
-
-        Tablero p(n, Vec(n, 0));
-        int cant_caballos = 0;
-        for(int i = 0; i < k; i++){
-            int f, c;
-            cin >> f >> c;
-            if (agregar_caballo(p, f, c) == true)
-                cant_caballos++;
-        }
-
-        int sol = resolver(p,cant_caballos);
-        cout << endl << "El tablero optimo tiene " << sol << " caballos." << endl;
+    cin >> n;
+    if(cin.eof()){
+        return 1;
     }
+    cin >> k;
+    if(cin.eof()){
+        return 1;
+    }
+
+    Tablero p(n, Vec(n, 0));
+    int cant_caballos = 0;
+    for(int i = 0; i < k; i++){
+        int f, c;
+        cin >> f >> c;
+        if (agregar_caballo(p, f, c) == true)
+            cant_caballos++;
+    }
+
+    int sol = resolver(p,cant_caballos);
+    //cout << endl << "El tablero optimo tiene " << sol << " caballos." << endl;
+    cout << sol - cant_caballos << endl;
 
     return 0;
 }
@@ -168,13 +167,13 @@ int resolver(Tablero& p, int cant_caballos) {
     // calculo una primera cota para el tablero optimo con un algoritmo goloso
     Tablero optimo = p;
     int cota = cota_goloso(optimo, cant_caballos);
-    cout << "Cota algoritmo goloso: " << cota << endl;
+    //cout << "Cota algoritmo goloso: " << cota << endl;
     // guardo el tablero original para saber cuales eran los caballos que venian al principio
     Tablero original = p;
     // empiezo evaluando en el (0,0)
     Coord principio(0, 0);
     int sol = aux_resolver(p, principio, cant_caballos, cota, original, cant_caballos);
-    cout << sol << endl;
+    //cout << sol << endl;
     return sol;
 }
 
