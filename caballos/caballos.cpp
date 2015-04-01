@@ -213,7 +213,7 @@ int resolver(Tablero& p, int n, int cant_caballos) {
 int aux_resolver(Tablero& p, int n, Coord actual, int cant_caballos, Tablero& t_optimo, int c_optimo, Tablero& original, int cant_caballos_original) {
     //Poda caso S
     int precomputed_solutions[] = {0,1,4,4,4,5,8,10,12,14,16};
-    if ((n < 11 && c_optimo == precomputed_solutions[n]) || cant_caballos >= precomputed_solutions[n] + cant_caballos_original)
+    if (n < 11 && (c_optimo == precomputed_solutions[n] || cant_caballos > precomputed_solutions[n] + cant_caballos_original))
         return c_optimo;
 
     //Poda caso Z
