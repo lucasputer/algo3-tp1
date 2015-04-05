@@ -33,7 +33,7 @@ int main() {
                 // 15 muestras aleatorias para cada combinacion de n y k
                 char program[512];
                 cout << n << " " << k << endl;
-                fprintf(file, "%d %d\n", n, k);
+                fprintf(file, "%d ", n*n - k);
                 if (k == 0) {
                     sprintf(program, echo_base_0, n, k);
                     strcat(program, program_base_0);
