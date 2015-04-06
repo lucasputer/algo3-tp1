@@ -175,6 +175,7 @@ int resolver(Tablero& p, int cant_caballos) {
     Tablero original = p;
     // empiezo evaluando en el (0,0)
     Coord principio(0, 0);
+    int n = p.size();
     int sol = aux_resolver(p, principio, cant_caballos, cota, original, cant_caballos);
     //cout << sol << endl;
     return sol;
