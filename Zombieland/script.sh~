@@ -3,6 +3,7 @@ for file in files/*
 do
   if [ ${file: -3} == ".in" ]
   then
+      echo ${file}
       cat $file | ./ejercicio1-timer
 
   fi

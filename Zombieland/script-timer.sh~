@@ -4,8 +4,8 @@ do
   if [ ${file: -3} == ".txt" ]
   then
       echo ${file}
-      echo -n "tamanio - tiempo: "
-      cat $file | ./ejercicio
+      echo -n "n - tiempo: "
+      cat $file | ./ejercicio1-timer
 
   fi
   done

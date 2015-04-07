@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <vector>
 #include <iostream>
-#include <time>
+#include <time.h>
 using namespace std;
 
 struct datoCiudad {
@@ -84,7 +84,7 @@ int main() {
         cout << soldadosPorCiudad[i] << ' ';
     }
     cout << endl;*/
-    timer = clock() - timer
-    cout << n << " - ";
+    timer = clock() - timer;
+    //cout << n << endl;
     cout << timer << endl;	
 }
