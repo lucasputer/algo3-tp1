@@ -17,7 +17,7 @@ int main() {
         	while (n > 0) { // genero la instancia
 			int z = rand() % 10000; // -1 < n < 10001
 			int s = rand() % 1000;
-			int c =	rand() % 1000;		
+			int c =	rand() % 100;		
 			fprintf(file, "%d %d %d\n", z, s, c);
 			n --;	
 		}

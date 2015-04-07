@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <vector>
 #include <iostream>
+#include <time>
 using namespace std;
 
 struct datoCiudad {
@@ -25,6 +26,8 @@ int main() {
     // Cantidad de Ciudades
     int n;
     cin >> n;
+    clock_t timer;
+    timer = clock();
     // Presupuesto
     int P;
     cin >> P;
@@ -81,5 +84,7 @@ int main() {
         cout << soldadosPorCiudad[i] << ' ';
     }
     cout << endl;*/
-    cout << ciudadesSalvadas << endl;
+    timer = clock() - timer
+    cout << n << " - ";
+    cout << timer << endl;	
 }
