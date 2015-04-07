@@ -168,15 +168,15 @@ void mostrar(const Tablero& m) {
  */
 int resolver(Tablero& p, int cant_caballos) {
     // calculo una primera cota para el tablero optimo con un algoritmo goloso
-    Tablero optimo = p;
-    int cota = cota_goloso(optimo, cant_caballos);
+    //Tablero optimo = p;
+    //int cota = cota_goloso(optimo, cant_caballos);
     //cout << "Cota algoritmo goloso: " << cota << endl;
     // guardo el tablero original para saber cuales eran los caballos que venian al principio
     Tablero original = p;
     // empiezo evaluando en el (0,0)
     Coord principio(0, 0);
     int n = p.size();
-    int sol = aux_resolver(p, principio, cant_caballos, cota, original, cant_caballos);
+    int sol = aux_resolver(p, principio, cant_caballos, n*n, original, cant_caballos);
     //cout << sol << endl;
     return sol;
 }
@@ -216,14 +216,14 @@ int resolver(Tablero& p, int cant_caballos) {
 int aux_resolver(Tablero& p, Coord actual, int cant_caballos, int c_optimo, Tablero& original, int cant_caballos_original) {
     int n = p.size();
     //Poda caso S
-    int precomputed_solutions[] = {0,1,4,4,4,5,8,10,12,14,16};
+    /*int precomputed_solutions[] = {0,1,4,4,4,5,8,10,12,14,16};
     if (n < 11 && (c_optimo == precomputed_solutions[n] || cant_caballos > precomputed_solutions[n] + cant_caballos_original))
-        return c_optimo;
+        return c_optimo;*/
 
     //Poda caso Z
-    if (cant_caballos >= c_optimo)
-        return c_optimo;
-
+    //if (cant_caballos >= c_optimo)
+    //    return c_optimo;
+    
     //Encuentro proxima coordenada a rellenar
     if (actual.first < n && p[actual.first][actual.second] == 1)
         actual = proxima_coordenada(p, actual);
