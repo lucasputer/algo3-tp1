@@ -1,7 +1,6 @@
 #include <utility>
 #include <vector>
 #include <iostream>
-#include <time.h>
 using namespace std;
 
 // Varios typedefs
@@ -17,8 +16,8 @@ struct Signal {
 typedef vector<Signal> Vec;
 
 // Prototipado de funciones
-Vec mergeSort(vector<Signal>& vec);
-Vec merge(Vec &vec, Vec& izq,  Vec& der);
+void mergeSort(vector<Signal>& vec);
+void merge(Vec& izq, Vec& der, Vec& result);
 void mergeAux(Vec& menor, Vec& mayor, int& i, int& j,Vec& result);
 void mostrar(const Vec& v);
 void mostrarPrueba(const Vec& v);
@@ -27,13 +26,14 @@ void mostrarPrueba(const Vec& v);
 int main() {
     int n;
 
-    while(true) {
+    // while(true) {
         cin >> n;
-        if(cin.eof()) {
-            break;
-        }
+        // if(cin.eof()) {
+        //     break;
+        // }
 
-        Vec l(n);
+        Vec l;
+        l.reserve(n);
         for(int i = 0; i < n; ++i) {
             int j=0;
             int values [3];
@@ -41,24 +41,22 @@ int main() {
                 cin >> values[j];
                 j++;
             }
-            l[i] = Signal(i+1,values[0],values[1],values[2]);
+            l.push_back(Signal(i+1,values[0],values[1],values[2]));
         }
 
-            clock_t timer;
-            timer = clock();
+        int i = 0;
+        scanf("%d", &i);
 
-        l = mergeSort(l);
-        timer = clock() - timer;
-        //cout << n << endl;
-        cout << timer << endl;
-    }
+        mergeSort(l);
+        //mostrar(l);
+    // }
 
     return 0;
 }
 
-Vec mergeSort(vector<Signal>& vec) {
+void mergeSort(vector<Signal>& vec) {
     if(vec.size() == 1) {
-        return vec;
+        return;
     }
 
     Vec::iterator medio = vec.begin() + (vec.size() / 2);
@@ -72,14 +70,17 @@ Vec mergeSort(vector<Signal>& vec) {
 
     // cout << "------------";
 
-    izq = mergeSort(izq);
-    der = mergeSort(der);
+    Vec result;
+    result.reserve(2*(izq.size()+der.size())+1); // O(n)
 
-    return merge(vec,izq, der);
+    mergeSort(izq); //T(n/2)
+    mergeSort(der); //T(n/2)
+    merge(izq, der, result); // O(n)
+
+    vec = result; // O(n)
 }
 
-Vec merge(Vec &vec, Vec& izq,  Vec& der) {
-    Vec result;
+void merge(Vec& izq, Vec& der, Vec& result) {
     int izq_it = 0, der_it = 0;
 
     while(izq_it < izq.size() && der_it < der.size()) {
@@ -99,41 +100,34 @@ Vec merge(Vec &vec, Vec& izq,  Vec& der) {
         result.push_back(der[der_it]);
         der_it++;
     }
-    vec = result;
     // cout << endl;
     // cout << "***********";
-    // mostrarPrueba(vec);
+    // mostrarPrueba(result);
     // cout << "***********";
-    return vec;
 }
 
-void mergeAux(Vec& menor, Vec& mayor, int& i, int& j,Vec& result) {
-    bool flag = false;
-    if(menor[i].costo <= mayor[j].costo) {
-        if(mayor[j].principio <= menor[i].fin) {
-            mayor[j].principio = menor[i].fin;
+void mergeAux(Vec& primera, Vec& segunda, int& i, int& j,Vec& result) {
+    if(primera[i].costo <= segunda[j].costo) {
+        if(segunda[j].principio <= primera[i].fin) {
+            segunda[j].principio = primera[i].fin;
         }
-        if(mayor[j].principio >= mayor[j].fin) {
+        if(segunda[j].principio >= segunda[j].fin) {
             j++;
-            flag = true;
-        }
-        if(!flag) {
-            result.push_back(menor[i]);
+        }else{
+            result.push_back(primera[i]);
             i++;
-        } else {
-            flag = false;
         }
     } else {
-        int aux = menor[i].fin;
-        if(mayor[j].principio <= menor[i].fin) {
-            menor[i].fin = mayor[j].principio;
+        int aux = primera[i].fin;
+        if(segunda[j].principio <= primera[i].fin) {
+            primera[i].fin = segunda[j].principio;
         }
-        if(menor[i].fin > menor[i].principio) {
-            result.push_back(menor[i]);
+        if(primera[i].fin > primera[i].principio) {
+            result.push_back(primera[i]);
         }
-        if(mayor[j].fin < aux) {
-            menor[i].principio = mayor[j].fin;
-            menor[i].fin = aux;
+        if(segunda[j].fin < aux) {
+            primera[i].principio = segunda[j].fin;
+            primera[i].fin = aux;
         } else {
             i++;
         }
@@ -144,21 +138,21 @@ void mergeAux(Vec& menor, Vec& mayor, int& i, int& j,Vec& result) {
  * Recibe un vector y lo muestra por pantalla
  */
 void mostrar(const Vec& v) {
-    cout << endl;
+    //cout << endl;
     int n = v.size();
     int finalCost = 0;
     for(int i = 0; i < n; ++i) {
         finalCost += v[i].costo * (v[i].fin - v[i].principio);
     }
     cout << finalCost;
-    cout << endl;
+    //cout << endl;
 
-    for(int i = 0; i < n; ++i) {
-        cout << v[i].numero;
-        cout << " " << v[i].principio;
-        cout << " " << v[i].fin;
-        cout << endl;
-    }
+    // for(int i = 0; i < n; ++i) {
+    //     cout << v[i].numero;
+    //     cout << " " << v[i].principio;
+    //     cout << " " << v[i].fin;
+    //     cout << endl;
+    // }
 }
 
 void mostrarPrueba(const Vec& v) {

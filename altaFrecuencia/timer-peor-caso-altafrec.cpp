@@ -38,93 +38,64 @@ typedef vector<Signal> Vec;
 
 // Implementacion
 int main() {
-    FILE* file = fopen("peoresTiempos.txt","w+");
+    FILE* file = fopen("tiempos.txt","w+");
     srand(time(NULL));
     // "echo '3 0' | ./caballos"
     // "echo '1 1 1 2' | .ej2"
     const char *echo_base = "echo '%d";
     const char *echo_lines = " %d %d %d";
 
-    const char *program_base = "' | ./ej2";;
+    const char *program_base = "' | ./ej2-timer";;
 
-    int n_max = 100;
-    int muestras = 100;
-    std::vector<double> tiempos = std::vector<double>(n_max, 0);
+    int n_max = 200;
+    int muestras = 1;
+    std::vector<long long int> tiempos = std::vector<long long int>(n_max, 0);
 
     for (int m = 1; m <= muestras; m++) {
 
-        Vec entradas = Vec(n_max);
+        Vec entradas;
+        entradas.reserve(n_max);
 
-        char program[100000];
-            sprintf(program, echo_base, 1);
+        int c = 1;
+        int i = 1; // 1< i < 10001
+        int f = 2; // i< f <10002
+ 
 
-            int c = rand() % 1001; // 1< c < 10002
-            int i = rand() % 1000 + 1; // 1< i < 10001
-            int f = rand() % 1000 + i + n_max; // i< f <10002
-
-            entradas[0]=(Signal(1, c, i, f));
-
-
-            char saux[32];
-            sprintf(saux, echo_lines, entradas[0].costo, entradas[0].principio, entradas[0].fin);
-            strcat(program, saux);
-            
+        for (int n = 1; n <= n_max; n++) {
 
 
-            strcat(program,program_base);
+            char program[100000];
+            sprintf(program, echo_base, n);
 
-            double tiempo =0;
-            startTimer();
-            system(program);
-            tiempo = endTimer();
-            cout << endl;
-            cout << tiempo;
+            //c--; // 1< c < 10002
+            i++; // 1< i < 10001
+            f++; // i< f <10002
 
-            tiempos[0] += tiempo;
-
-
-        for (int n = 2; n <= n_max; n++) {
-
-
-            char program2[100000];
-            sprintf(program2, echo_base, n);
-
-            c = c-1; // 1< c < 10002
-            i = i+1; // 1< i < 10001
-            f = f-1; // i< f <10002
-
-            entradas[n-1]=(Signal(n, c, i, f));
-
-
-            char saux[32];
-            sprintf(saux, echo_lines, entradas[0].costo, entradas[0].principio, entradas[0].fin);
-            strcat(program2, saux);
+            entradas.push_back(Signal(n, c, i, f));
 
             for (vector<Signal>::iterator iter = entradas.begin() ; iter != entradas.end() ; iter++) {
+                char saux[32];
                 sprintf(saux, echo_lines, iter->costo, iter->principio, iter->fin);
-                strcat(program2, saux);
+                strcat(program, saux);
             }
-
 
             strcat(program,program_base);
 
-            double tiempo2 =0;
-            startTimer();
-            system(program2);
-            tiempo2 = endTimer();
-            cout << endl;
-            cout << tiempo;
+            system(program);
+            std::chrono::time_point<std::chrono::high_resolution_clock> t1 = std::chrono::high_resolution_clock::now();
+            system("echo '1'");
+            std::chrono::time_point<std::chrono::high_resolution_clock> t2 = std::chrono::high_resolution_clock::now();
 
+            tiempos[n-1] = std::chrono::duration_cast<std::chrono::nanoseconds>(t2-t1).count();
 
-
-            tiempos[n-1] += tiempo2;
+            cout << m << " " << n << endl;
         }
     }
 
     cout << endl;
     for (int i = 0; i < n_max; i++) {
-        double aux = tiempos[i] /  double(muestras);
-        fprintf(file, "%d %7.8f\n", i+1, aux);
+        long long int aux = tiempos[i] / muestras;
+        fprintf(file, "%d %lld\n", i+1, aux);
     }
 
     fclose(file);

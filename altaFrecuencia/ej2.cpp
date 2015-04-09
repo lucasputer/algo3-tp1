@@ -26,11 +26,11 @@ void mostrarPrueba(const Vec& v);
 int main() {
     int n;
 
-    while(true) {
+    // while(true) {
         cin >> n;
-        if(cin.eof()) {
-            break;
-        }
+        // if(cin.eof()) {
+        //     break;
+        // }
 
         Vec l;
         l.reserve(n);
@@ -46,7 +46,7 @@ int main() {
 
         mergeSort(l);
         mostrar(l);
-    }
+    // }
 
     return 0;
 }
@@ -135,21 +135,21 @@ void mergeAux(Vec& primera, Vec& segunda, int& i, int& j,Vec& result) {
  * Recibe un vector y lo muestra por pantalla
  */
 void mostrar(const Vec& v) {
-    cout << endl;
+    //cout << endl;
     int n = v.size();
     int finalCost = 0;
     for(int i = 0; i < n; ++i) {
         finalCost += v[i].costo * (v[i].fin - v[i].principio);
     }
     cout << finalCost;
-    cout << endl;
+    //cout << endl;
 
-    for(int i = 0; i < n; ++i) {
-        cout << v[i].numero;
-        cout << " " << v[i].principio;
-        cout << " " << v[i].fin;
-        cout << endl;
-    }
+    // for(int i = 0; i < n; ++i) {
+    //     cout << v[i].numero;
+    //     cout << " " << v[i].principio;
+    //     cout << " " << v[i].fin;
+    //     cout << endl;
+    // }
 }
 
 void mostrarPrueba(const Vec& v) {
