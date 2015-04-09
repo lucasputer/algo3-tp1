@@ -44,12 +44,17 @@ int main() {
             l.push_back(Signal(i+1,values[0],values[1],values[2]));
         }
 
-        int i = 0;
-        scanf("%d", &i);
+        clock_t timer;
+        timer = clock();
 
         mergeSort(l);
         //mostrar(l);
     // }
+
+    timer = clock() - timer;
+    FILE* file = fopen("tiempos_caca.txt","a+");
+    fprintf(file, "%d %ld\n",n, timer);
+    fclose(file);
 
     return 0;
 }
