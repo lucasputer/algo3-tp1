@@ -44,17 +44,18 @@ int main() {
             l.push_back(Signal(i+1,values[0],values[1],values[2]));
         }
 
-        clock_t timer;
-        timer = clock();
-
+        // clock_t timer;
+        // timer = clock();
+        int a;
+        cin >> a;
         mergeSort(l);
         //mostrar(l);
     // }
 
-    timer = clock() - timer;
-    FILE* file = fopen("tiempos_caca.txt","a+");
-    fprintf(file, "%d %ld\n",n, timer);
-    fclose(file);
+    // timer = clock() - timer;
+    // FILE* file = fopen("tiempos_caca.txt","a+");
+    // fprintf(file, "%d %ld\n",n, timer);
+    // fclose(file);
 
     return 0;
 }
