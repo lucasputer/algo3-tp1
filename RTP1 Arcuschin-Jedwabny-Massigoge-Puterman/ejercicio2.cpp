@@ -20,42 +20,26 @@ void mergeSort(vector<Signal>& vec);
 void merge(Vec& izq, Vec& der, Vec& result);
 void mergeAux(Vec& menor, Vec& mayor, int& i, int& j,Vec& result);
 void mostrar(const Vec& v);
-void mostrarPrueba(const Vec& v);
 
 // Implementación
 int main() {
     int n;
+    cin >> n;
 
-    // while(true) {
-        cin >> n;
-        // if(cin.eof()) {
-        //     break;
-        // }
-
-        Vec l;
-        l.reserve(n);
-        for(int i = 0; i < n; ++i) {
-            int j=0;
-            int values [3];
-            while(j<3) {
-                cin >> values[j];
-                j++;
-            }
-            l.push_back(Signal(i+1,values[0],values[1],values[2]));
+    Vec l;
+    l.reserve(n);
+    for(int i = 0; i < n; ++i) {
+        int j=0;
+        int values [3];
+        while(j<3) {
+            cin >> values[j];
+            j++;
         }
+        l.push_back(Signal(i+1,values[0],values[1],values[2]));
+    }
 
-        // clock_t timer;
-        // timer = clock();
-        // int a;
-        // cin >> a;
-        mergeSort(l);
-        //mostrar(l);
-    // }
-
-    // timer = clock() - timer;
-    // FILE* file = fopen("tiempos_caca.txt","a+");
-    // fprintf(file, "%d %ld\n",n, timer);
-    // fclose(file);
+    mergeSort(l);
+    mostrar(l);
 
     return 0;
 }
@@ -69,12 +53,6 @@ void mergeSort(vector<Signal>& vec) {
 
     Vec izq(vec.begin(), medio);
     Vec der(medio, vec.end());
-
-    // mostrarPrueba( izq);
-    // cout << ">>>>>>>>>>>";
-    // mostrarPrueba( der);
-
-    // cout << "------------";
 
     Vec result;
     result.reserve(2*(izq.size()+der.size())+1); // O(n)
@@ -106,10 +84,6 @@ void merge(Vec& izq, Vec& der, Vec& result) {
         result.push_back(der[der_it]);
         der_it++;
     }
-    // cout << endl;
-    // cout << "***********";
-    // mostrarPrueba(result);
-    // cout << "***********";
 }
 
 void mergeAux(Vec& primera, Vec& segunda, int& i, int& j,Vec& result) {
@@ -119,7 +93,7 @@ void mergeAux(Vec& primera, Vec& segunda, int& i, int& j,Vec& result) {
         }
         if(segunda[j].principio >= segunda[j].fin) {
             j++;
-        }else{
+        } else {
             result.push_back(primera[i]);
             i++;
         }
@@ -150,26 +124,13 @@ void mostrar(const Vec& v) {
     for(int i = 0; i < n; ++i) {
         finalCost += v[i].costo * (v[i].fin - v[i].principio);
     }
-    cout << finalCost;
-    //cout << endl;
-
-    // for(int i = 0; i < n; ++i) {
-    //     cout << v[i].numero;
-    //     cout << " " << v[i].principio;
-    //     cout << " " << v[i].fin;
-    //     cout << endl;
-    // }
-}
-
-void mostrarPrueba(const Vec& v) {
-    cout << endl;
-    int n = v.size();
+    cout << finalCost << endl;
 
     for(int i = 0; i < n; ++i) {
-        cout << v[i].numero;
-        cout << " " << v[i].costo;
-        cout << " " << v[i].principio;
+        cout << v[i].principio;
         cout << " " << v[i].fin;
+        cout << " " << v[i].numero;
         cout << endl;
     }
+    cout << -1 << endl;
 }

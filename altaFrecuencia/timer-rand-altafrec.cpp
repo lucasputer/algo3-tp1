@@ -38,7 +38,7 @@ typedef vector<Signal> Vec;
 
 // Implementacion
 int main() {
-    FILE* file = fopen("tiemposaa.txt","w+");
+    FILE* file = fopen("tiemposrand.txt","w+");
     srand(time(NULL));
     // "echo '3 0' | ./caballos"
     // "echo '1 1 1 2' | .ej2"
@@ -86,12 +86,11 @@ int main() {
 
             strcat(program,program_base);
 
-            system(program);
             std::chrono::time_point<std::chrono::high_resolution_clock> t1 = std::chrono::high_resolution_clock::now();
-            system("echo '1'");
+            system(program);
             std::chrono::time_point<std::chrono::high_resolution_clock> t2 = std::chrono::high_resolution_clock::now();
 
-            long long int tiempo = (t2-t1).count();
+            long long int tiempo = std::chrono::duration_cast<std::chrono::nanoseconds>(t2-t1).count();
 
             tiempos[n-1] += tiempo;
 

@@ -6,7 +6,8 @@ using namespace std;
 // Varios typedefs
 struct Signal {
     Signal() : numero(0), costo(0), principio(0), fin(0) {};
-    Signal(const int n,const int c,const int p, const int f) : numero(n), costo(c), principio(p), fin(f) {};
+    Signal(const int n,const int c,const int p, const int f) :
+    	numero(n), costo(c), principio(p), fin(f) {};
 
     int numero;
     int costo;
@@ -20,42 +21,26 @@ void mergeSort(vector<Signal>& vec);
 void merge(Vec& izq, Vec& der, Vec& result);
 void mergeAux(Vec& menor, Vec& mayor, int& i, int& j,Vec& result);
 void mostrar(const Vec& v);
-void mostrarPrueba(const Vec& v);
 
-// Implementación
+// Implementacion
 int main() {
     int n;
+    cin >> n;
 
-    // while(true) {
-        cin >> n;
-        // if(cin.eof()) {
-        //     break;
-        // }
-
-        Vec l;
-        l.reserve(n);
-        for(int i = 0; i < n; ++i) {
-            int j=0;
-            int values [3];
-            while(j<3) {
-                cin >> values[j];
-                j++;
-            }
-            l.push_back(Signal(i+1,values[0],values[1],values[2]));
+    Vec l;
+    l.reserve(n);
+    for(int i = 0; i < n; ++i) {
+        int j=0;
+        int values [3];
+        while(j<3) {
+            cin >> values[j];
+            j++;
         }
+        l.push_back(Signal(i+1,values[0],values[1],values[2]));
+    }
 
-        // clock_t timer;
-        // timer = clock();
-        // int a;
-        // cin >> a;
-        mergeSort(l);
-        //mostrar(l);
-    // }
-
-    // timer = clock() - timer;
-    // FILE* file = fopen("tiempos_caca.txt","a+");
-    // fprintf(file, "%d %ld\n",n, timer);
-    // fclose(file);
+    mergeSort(l);
+    mostrar(l);
 
     return 0;
 }
@@ -69,15 +54,14 @@ void mergeSort(vector<Signal>& vec) {
 
     Vec izq(vec.begin(), medio);
     Vec der(medio, vec.end());
-
-    // mostrarPrueba( izq);
-    // cout << ">>>>>>>>>>>";
-    // mostrarPrueba( der);
-
-    // cout << "------------";
-
     Vec result;
-    result.reserve(2*(izq.size()+der.size())+1); // O(n)
+
+    /**
+    * Se reservan para resultado (2*n)-1 lugares, ya que en peor caso mergeSort
+    * devuelve un vector del doble del original menos uno, esto se debe a que se
+    * necesitan en peor caso 3 frecuencias en resultado al comparar dos frecuencias.
+     */
+    result.reserve(2*(izq.size()+der.size())-1); // O(n)
 
     mergeSort(izq); //T(n/2)
     mergeSort(der); //T(n/2)
@@ -106,12 +90,12 @@ void merge(Vec& izq, Vec& der, Vec& result) {
         result.push_back(der[der_it]);
         der_it++;
     }
-    // cout << endl;
-    // cout << "***********";
-    // mostrarPrueba(result);
-    // cout << "***********";
 }
 
+/**
+* Compara dos frecuencias donde primera tiene <= tiempo de inicio que segunda.
+* Si es necesario agrega alguna al resultado y aumenta izq_it y der_it.
+ */
 void mergeAux(Vec& primera, Vec& segunda, int& i, int& j,Vec& result) {
     if(primera[i].costo <= segunda[j].costo) {
         if(segunda[j].principio <= primera[i].fin) {
@@ -144,32 +128,18 @@ void mergeAux(Vec& primera, Vec& segunda, int& i, int& j,Vec& result) {
  * Recibe un vector y lo muestra por pantalla
  */
 void mostrar(const Vec& v) {
-    //cout << endl;
     int n = v.size();
     int finalCost = 0;
     for(int i = 0; i < n; ++i) {
         finalCost += v[i].costo * (v[i].fin - v[i].principio);
     }
-    cout << finalCost;
-    //cout << endl;
-
-    // for(int i = 0; i < n; ++i) {
-    //     cout << v[i].numero;
-    //     cout << " " << v[i].principio;
-    //     cout << " " << v[i].fin;
-    //     cout << endl;
-    // }
-}
-
-void mostrarPrueba(const Vec& v) {
-    cout << endl;
-    int n = v.size();
+    cout << finalCost << endl;
 
     for(int i = 0; i < n; ++i) {
-        cout << v[i].numero;
-        cout << " " << v[i].costo;
-        cout << " " << v[i].principio;
+        cout << v[i].principio;
         cout << " " << v[i].fin;
+        cout << " " << v[i].numero;
         cout << endl;
     }
+    cout << -1 << endl;
 }

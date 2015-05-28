@@ -38,7 +38,7 @@ typedef vector<Signal> Vec;
 
 // Implementacion
 int main() {
-    FILE* file = fopen("tiempos.txt","w+");
+    FILE* file = fopen("tiempos-peores.txt","w+");
     srand(time(NULL));
     // "echo '3 0' | ./caballos"
     // "echo '1 1 1 2' | .ej2"
@@ -47,7 +47,7 @@ int main() {
 
     const char *program_base = "' | ./ej2-timer";;
 
-    int n_max = 200;
+    int n_max = 3000;
     int muestras = 1;
     std::vector<long long int> tiempos = std::vector<long long int>(n_max, 0);
 
@@ -56,10 +56,9 @@ int main() {
         Vec entradas;
         entradas.reserve(n_max);
 
-        int c = 1;
-        int i = 1; // 1< i < 10001
-        int f = 2; // i< f <10002
- 
+        int c = n_max + 1; // 1< c < 10002
+        int b = 2; // 1< i < 10001
+        int e = 2*n_max  + 1; // i< f <10002   
 
         for (int n = 1; n <= n_max; n++) {
 
@@ -67,28 +66,41 @@ int main() {
             char program[100000];
             sprintf(program, echo_base, n);
 
-            //c--; // 1< c < 10002
-            i++; // 1< i < 10001
-            f++; // i< f <10002
+            c--;
+            b++;
+            e--;
 
-            entradas.push_back(Signal(n, c, i, f));
+            entradas.push_back(Signal(n, c, b, e));
 
             for (vector<Signal>::iterator iter = entradas.begin() ; iter != entradas.end() ; iter++) {
                 char saux[32];
                 sprintf(saux, echo_lines, iter->costo, iter->principio, iter->fin);
                 strcat(program, saux);
             }
+            
+
+            // for (int x = 0; x < n; x++) {
+            //     int c = rand() % 100; // 1< c < 10002
+            //     int i = rand() % 1000; // 1< i < 10001
+            //     int f = rand() % 1000 + i + 1; // i< f <10002
+            //     char saux[32];
+            //     sprintf(saux, echo_lines, c, i, f);
+            //     strcat(program, saux);
+            // }
 
             strcat(program,program_base);
 
-            system(program);
             std::chrono::time_point<std::chrono::high_resolution_clock> t1 = std::chrono::high_resolution_clock::now();
-            system("echo '1'");
+            system(program);
             std::chrono::time_point<std::chrono::high_resolution_clock> t2 = std::chrono::high_resolution_clock::now();
 
-            tiempos[n-1] = std::chrono::duration_cast<std::chrono::nanoseconds>(t2-t1).count();
+            long long int tiempo = std::chrono::duration_cast<std::chrono::nanoseconds>(t2-t1).count();
 
+            tiempos[n-1] += tiempo;
+
+            //cout << tiempos[n-1] << endl;
             cout << m << " " << n << endl;
+            //cout  << tiempo << endl;
         }
     }
 
